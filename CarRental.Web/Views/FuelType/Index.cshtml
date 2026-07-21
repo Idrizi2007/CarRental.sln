@@ -1,0 +1,30 @@
+﻿@model IEnumerable<FuelType>
+
+<h1>Fuel Types</h1>
+
+<a asp-controller="FuelType" asp-action="Create" class="btn btn-primary mb-3">Add New</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Active</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var fuelType in Model)
+        {
+            <tr>
+                <td>@fuelType.Id</td>
+                <td>@fuelType.Name</td>
+                <td>@(fuelType.IsActive ? "Yes" : "No")</td>
+                <td>
+                    <a asp-controller="FuelType" asp-action="Edit" asp-route-id="@fuelType.Id" class="btn btn-sm btn-secondary">Edit</a>
+                    <a asp-controller="FuelType" asp-action="Delete" asp-route-id="@fuelType.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
