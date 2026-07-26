@@ -29,10 +29,33 @@ namespace CarRental.Web.Controllers
             {
                 _unitOfWork.FuelType.Add(fuelType);
                 _unitOfWork.Save();
+                TempData["success"] = "Fuel Type created successfully!";
                 return RedirectToAction(nameof(Index));
             }
             return View(fuelType);
 
+        }
+
+        public IActionResult Edit(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            FuelType fuelType = _unitOfWork.FuelType.Get(u => u.Id == id);
+            return View(fuelType);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(FuelType fuelType)
+        {
+            if (ModelState.IsValid)
+            {
+                _unitOfWork.FuelType.Update(fuelType);
+                _unitOfWork.Save();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(fuelType);
         }
 
     }
