@@ -1,0 +1,15 @@
+{
+  "version": "3.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "tinymce@8.7.0",
+      "destination": "wwwroot/lib/tinymce/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "sweetalert2@11.26.25",
+      "destination": "wwwroot/lib/sweetalert2/"
+    }
+  ]
+}

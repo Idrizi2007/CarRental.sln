@@ -1,0 +1,29 @@
+@model IEnumerable<TransmissionType>
+
+<h1>Transmission Types</h1>
+
+<a asp-controller="TransmissionType" asp-action="Create" class="btn btn-primary mb-3">Add New</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Active</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var transmissionType in Model)
+        {
+            <tr>
+                <td>@transmissionType.Id</td>
+                <td>@transmissionType.Name</td>
+                <td>@(transmissionType.IsActive ? "Yes" : "No")</td>
+                <td>
+                    <a asp-controller="TransmissionType" asp-action="Edit" asp-route-id="@transmissionType.Id" class="btn btn-sm btn-secondary">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

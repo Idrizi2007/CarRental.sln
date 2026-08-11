@@ -8,48 +8,137 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CarRental.Web.styles.css" asp-append-version="true" />
+    <style>
+        /* sidebar + content sit side by side, full height */
+        .page-body {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            background-color: #1f2937;
+            color: #d1d5db;
+            padding: 1rem 0;
+        }
+
+        .sidebar-brand {
+            display: block;
+            padding: 0.5rem 1.25rem 1rem;
+            color: #fff !important;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .sidebar-heading {
+            padding: 0.75rem 1.25rem 0.35rem;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 0.5rem 1.25rem;
+            color: #d1d5db;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+        }
+
+            .sidebar a:hover {
+                background-color: #374151;
+                color: #fff;
+            }
+
+            .sidebar a.active {
+                background-color: #374151;
+                color: #fff;
+                border-left-color: #3b82f6;
+            }
+
+        /* everything to the right of the sidebar */
+        .page-main {
+            flex-grow: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: #f9fafb;
+        }
+
+        .page-content {
+            flex-grow: 1;
+            padding: 1.5rem;
+        }
+
+        /* stack on small screens */
+        @@media (max-width: 767.98px) {
+            .page-body {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CarRental.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="FuelType" asp-action="Index">Fuel Types</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-           
-            @RenderBody()
-        </main>
-    </div>
+    <div class="page-body">
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - CarRental.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            @* admin sidebar — the active link highlights itself based on the current controller *@
+            @{
+                var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+            }
+            <nav class="sidebar">
+                <a class="sidebar-brand" asp-area="Customer" asp-controller="Home" asp-action="Index">CarRental</a>
+
+                <div class="sidebar-heading">Site</div>
+                <a asp-area="Customer" asp-controller="Home" asp-action="Index"
+                   class="@(currentController == "Home" ? "active" : "")">Home</a>
+                <a asp-area="Customer" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+                <div class="sidebar-heading">Manage</div>
+                <a asp-area="Admin" asp-controller="Vehicle" asp-action="Index"
+                   class="@(currentController == "Vehicle" ? "active" : "")">Vehicles</a>
+
+                <div class="sidebar-heading">Lookups</div>
+                <a asp-area="Admin" asp-controller="FuelType" asp-action="Index"
+                   class="@(currentController == "FuelType" ? "active" : "")">Fuel Types</a>
+                <a asp-area="Admin" asp-controller="TransmissionType" asp-action="Index"
+                   class="@(currentController == "TransmissionType" ? "active" : "")">Transmissions</a>
+                <a asp-area="Admin" asp-controller="Category" asp-action="Index"
+                   class="@(currentController == "Category" ? "active" : "")">Categories</a>
+                <a asp-area="Admin" asp-controller="Brand" asp-action="Index"
+                   class="@(currentController == "Brand" ? "active" : "")">Brands</a>
+                <a asp-area="Admin" asp-controller="VehicleModel" asp-action="Index"
+                   class="@(currentController == "VehicleModel" ? "active" : "")">Models</a>
+                <a asp-area="Admin" asp-controller="Feature" asp-action="Index"
+                   class="@(currentController == "Feature" ? "active" : "")">Features</a>
+
+                <div class="sidebar-heading">Settings</div>
+                <a asp-area="Admin" asp-controller="SiteSetting" asp-action="Index"
+                   class="@(currentController == "SiteSetting" ? "active" : "")">Site Settings</a>
+            </nav>
+
+        <div class="page-main">
+            <main role="main" class="page-content">
+                @RenderBody()
+            </main>
+
+            <footer class="border-top footer text-muted px-4 py-3">
+                &copy; 2026 - CarRental.Web - <a asp-area="Customer" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </footer>
         </div>
-    </footer>
+    </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="~/lib/tinymce/tinymce.min.js"></script>
+    <script src="~/lib/sweetalert2/sweetalert2.all.min.js"></script>
     <partial name="_Notification"/>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

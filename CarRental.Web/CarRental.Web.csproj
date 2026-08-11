@@ -19,4 +19,9 @@
     <ProjectReference Include="..\CarRental.Utility\CarRental.Utility.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Customer\Data\" />
+    <Folder Include="Areas\Customer\Models\" />
+  </ItemGroup>
+
 </Project>

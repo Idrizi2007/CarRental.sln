@@ -1,0 +1,7 @@
+@host = https://localhost:7273
+
+### Delete a category
+DELETE {{host}}/Admin/Category/Delete/99
+
+### Delete a fuel type
+DELETE {{host}}/Admin/FuelType/Delete/1

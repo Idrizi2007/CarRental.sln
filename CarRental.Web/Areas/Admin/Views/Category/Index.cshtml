@@ -1,0 +1,46 @@
+@model IEnumerable<Category>
+
+<h1>Categories</h1>
+
+<a asp-controller="Category" asp-action="Create" class="btn btn-primary mb-3">Add New</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Active</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model)
+        {
+            <tr>
+                <td>@category.Name</td>
+                <td>
+                    @if (string.IsNullOrWhiteSpace(category.Description))
+                    {
+                        <span class="text-muted">&mdash;</span>
+                    }
+                    else
+                    {
+                        @Html.Raw(category.Description)
+                    }
+                </td>
+                <td>@(category.IsActive ? "Yes" : "No")</td>
+                <td>
+                    <a asp-controller="Category" asp-action="Edit" asp-route-id="@category.Id" class="btn btn-sm btn-secondary">Edit</a>
+                    <button type="button" class="btn btn-sm btn-danger"
+                            onclick="confirmDelete('@Url.Action("Delete", "Category", new { area = "Admin", id = category.Id })', '@category.Name')">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="~/js/admin-delete.js" asp-append-version="true"></script>
+}

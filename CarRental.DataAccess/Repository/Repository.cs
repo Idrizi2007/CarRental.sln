@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 
 namespace CarRental.DataAccess.Repository
 {
+
     public class Repository<T> : IRepository<T> where T : class
     {
         private readonly ApplicationDbContext _db;
@@ -50,6 +51,11 @@ namespace CarRental.DataAccess.Repository
                 query = query.Include(includeProperty);
             }
             return query.ToList();
+        }
+
+        public virtual void Update(T entity)
+        {
+            _dbSet.Update(entity);
         }
 
         public void Remove(T entity)
