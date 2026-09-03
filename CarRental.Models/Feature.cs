@@ -2,7 +2,7 @@
 
 namespace CarRental.Models
 {
-    public class TransmissionType : ILookup
+    public class Feature : ILookup
     {
         [Key]
         public int Id { get; set; }
@@ -11,7 +11,6 @@ namespace CarRental.Models
         [StringLength(50)]
         public string Name { get; set; } = string.Empty;
 
-        [Required]
         public bool IsActive { get; set; } = true;
     }
 }

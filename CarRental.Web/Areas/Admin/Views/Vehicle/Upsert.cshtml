@@ -1,0 +1,185 @@
+@model VehicleVM
+
+@{
+    var isNew = Model.Vehicle.Id == 0;
+    ViewData["Title"] = isNew ? "Add Vehicle" : "Edit Vehicle";
+}
+
+<h1 class="h3 mb-3">@ViewData["Title"]</h1>
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    @* Carries the id back on edit; posts 0 on create, which is how the POST
+       decides between Add and Update. CreatedAt is deliberately not here —
+       the repository preserves it on update. *@
+    <input type="hidden" asp-for="Vehicle.Id" />
+
+    <div class="row g-4">
+
+        @* ---------------- identity ---------------- *@
+        <div class="col-12">
+            <h2 class="h6 text-uppercase text-muted border-bottom pb-2">Identity</h2>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Vehicle.RegistrationPlate" class="form-label"></label>
+            <input asp-for="Vehicle.RegistrationPlate" class="form-control" placeholder="AA123BB" />
+            <span asp-validation-for="Vehicle.RegistrationPlate" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Vehicle.VehicleModelId" class="form-label"></label>
+            <select asp-for="Vehicle.VehicleModelId" asp-items="Model.VehicleModelList" class="form-select">
+                <option value="">-- select a model --</option>
+            </select>
+            <span asp-validation-for="Vehicle.VehicleModelId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Vehicle.CategoryId" class="form-label"></label>
+            <select asp-for="Vehicle.CategoryId" asp-items="Model.CategoryList" class="form-select">
+                <option value="">-- select a category --</option>
+            </select>
+            <span asp-validation-for="Vehicle.CategoryId" class="text-danger"></span>
+        </div>
+
+        @* ---------------- specification ---------------- *@
+        <div class="col-12 mt-4">
+            <h2 class="h6 text-uppercase text-muted border-bottom pb-2">Specification</h2>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Vehicle.FuelTypeId" class="form-label"></label>
+            <select asp-for="Vehicle.FuelTypeId" asp-items="Model.FuelTypeList" class="form-select">
+                <option value="">-- select --</option>
+            </select>
+            <span asp-validation-for="Vehicle.FuelTypeId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Vehicle.TransmissionTypeId" class="form-label"></label>
+            <select asp-for="Vehicle.TransmissionTypeId" asp-items="Model.TransmissionTypeList" class="form-select">
+                <option value="">-- select --</option>
+            </select>
+            <span asp-validation-for="Vehicle.TransmissionTypeId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Vehicle.Year" class="form-label"></label>
+            <input asp-for="Vehicle.Year" class="form-control" type="number" />
+            <span asp-validation-for="Vehicle.Year" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Vehicle.Color" class="form-label"></label>
+            <input asp-for="Vehicle.Color" class="form-control" placeholder="White" />
+            <span asp-validation-for="Vehicle.Color" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Vehicle.Seats" class="form-label"></label>
+            <input asp-for="Vehicle.Seats" class="form-control" type="number" />
+            <span asp-validation-for="Vehicle.Seats" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Vehicle.Doors" class="form-label"></label>
+            <input asp-for="Vehicle.Doors" class="form-control" type="number" />
+            <span asp-validation-for="Vehicle.Doors" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Vehicle.EngineSize" class="form-label"></label>
+            @* step allows one decimal place, matching decimal(3,1) *@
+            <input asp-for="Vehicle.EngineSize" class="form-control" type="number" step="0.1" placeholder="1.6" />
+            <div class="form-text">Leave empty for electric vehicles.</div>
+            <span asp-validation-for="Vehicle.EngineSize" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Vehicle.Mileage" class="form-label"></label>
+            <div class="input-group">
+                <input asp-for="Vehicle.Mileage" class="form-control" type="number" />
+                <span class="input-group-text">km</span>
+            </div>
+            <span asp-validation-for="Vehicle.Mileage" class="text-danger"></span>
+        </div>
+
+        @* ---------------- pricing ---------------- *@
+        <div class="col-12 mt-4">
+            <h2 class="h6 text-uppercase text-muted border-bottom pb-2">Pricing</h2>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Vehicle.RentalPricePerDay" class="form-label"></label>
+            <div class="input-group">
+                <span class="input-group-text">€</span>
+                <input asp-for="Vehicle.RentalPricePerDay" class="form-control" type="number" step="0.01" />
+            </div>
+            <span asp-validation-for="Vehicle.RentalPricePerDay" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end">
+            <div class="form-check mb-2">
+                <input asp-for="Vehicle.IsForRent" class="form-check-input" />
+                <label asp-for="Vehicle.IsForRent" class="form-check-label"></label>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="Vehicle.SalePrice" class="form-label"></label>
+            <div class="input-group">
+                <span class="input-group-text">€</span>
+                <input asp-for="Vehicle.SalePrice" class="form-control" type="number" step="0.01" />
+            </div>
+            <span asp-validation-for="Vehicle.SalePrice" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end">
+            <div class="form-check mb-2">
+                <input asp-for="Vehicle.IsForSale" class="form-check-input" />
+                <label asp-for="Vehicle.IsForSale" class="form-check-label"></label>
+            </div>
+        </div>
+
+        @* ---------------- description ---------------- *@
+        <div class="col-12 mt-4">
+            <h2 class="h6 text-uppercase text-muted border-bottom pb-2">Description</h2>
+        </div>
+
+        <div class="col-12">
+            <label asp-for="Vehicle.Description" class="form-label"></label>
+            <textarea asp-for="Vehicle.Description" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="Vehicle.Description" class="text-danger"></span>
+        </div>
+
+        <div class="col-12">
+            <div class="form-check">
+                <input asp-for="Vehicle.IsActive" class="form-check-input" />
+                <label asp-for="Vehicle.IsActive" class="form-check-label"></label>
+                <div class="form-text">Untick to hide this car from the public site without deleting it.</div>
+            </div>
+        </div>
+
+        <div class="col-12 mt-4">
+            <button type="submit" class="btn btn-primary">@(isNew ? "Create" : "Update")</button>
+            <a asp-action="Index" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+<script>
+    tinymce.init({
+        license_key: 'gpl',
+        selector: '#Vehicle_Description',
+        height: 300,
+        menubar: false,
+        toolbar: 'bold italic underline | bullist numlist | alignleft aligncenter alignright',
+        plugins: 'lists',
+        branding: false
+    });
+</script>
+<partial name="_ValidationScriptsPartial" />
+}

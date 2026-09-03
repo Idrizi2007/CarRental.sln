@@ -2,7 +2,7 @@
 
 namespace CarRental.Models
 {
-    public class FuelType
+    public class FuelType : ILookup
     {
         [Key]
         public int Id { get; set; }

@@ -11,12 +11,24 @@ namespace CarRental.DataAccess.Repository
 
         public ICategoryRepository Category { get; private set; }
 
+        public IBrandRepository Brand { get; private set; }
+
+        public IVehicleModelRepository VehicleModel { get; private set; }
+
+        public IFeatureRepository Feature { get; private set; }
+
+        public IVehicleRepository Vehicle { get; private set; }
+
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
             FuelType = new FuelTypeRepository(_db);
             TransmissionType = new TransmissionTypeRepository(_db);
             Category = new CategoryRepository(_db);
+            Brand = new BrandRepository(_db);
+            VehicleModel = new VehicleModelRepository(_db);
+            Feature = new FeatureRepository(_db);
+            Vehicle = new VehicleRepository(_db);
         }
 
 

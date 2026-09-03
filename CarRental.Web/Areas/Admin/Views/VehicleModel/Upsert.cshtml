@@ -1,0 +1,45 @@
+@model VehicleModelVM
+
+@{
+    // Id 0 means nothing loaded it from the database, so this is a create.
+    var isNew = Model.VehicleModel.Id == 0;
+    ViewData["Title"] = isNew ? "Create Model" : "Edit Model";
+}
+
+<h1 class="h3 mb-3">@ViewData["Title"]</h1>
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    @* Carries the id back on edit; posts 0 on create, which is how the
+       POST action decides between Add and Update. *@
+    <input type="hidden" asp-for="VehicleModel.Id" />
+
+    <div class="mb-3">
+        <label asp-for="VehicleModel.Name" class="form-label">Model name</label>
+        <input asp-for="VehicleModel.Name" class="form-control" placeholder="Golf" />
+        <span asp-validation-for="VehicleModel.Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="VehicleModel.BrandId" class="form-label"></label>
+        @* asp-for sets the posted value and pre-selects the current one;
+           asp-items supplies the options from the view model. *@
+        <select asp-for="VehicleModel.BrandId" asp-items="Model.BrandList" class="form-select">
+            <option disabled selected value="">-- select a brand --</option>
+        </select>
+        <span asp-validation-for="VehicleModel.BrandId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3 form-check">
+        <input asp-for="VehicleModel.IsActive" class="form-check-input" />
+        <label asp-for="VehicleModel.IsActive" class="form-check-label"></label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">@(isNew ? "Create" : "Update")</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

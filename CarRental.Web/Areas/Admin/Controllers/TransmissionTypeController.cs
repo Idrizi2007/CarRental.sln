@@ -63,5 +63,24 @@ namespace CarRental.Web.Areas.Admin.Controllers
             }
             return View(transmissionType);
         }
+        #region Api Call
+        [HttpDelete]
+        public IActionResult Delete(int? id)
+        {
+            if (id == 0 || id == null)
+            {
+                return BadRequest(new { message = "Invalid transmission type id." });
+            }
+            TransmissionType transmissionType = _unitOfWork.TransmissionType.Get(u => u.Id == id);
+            if (transmissionType == null)
+            {
+                return NotFound(new { message = "Transmission type not found." });
+            }
+            _unitOfWork.TransmissionType.Remove(transmissionType);
+            _unitOfWork.Save();
+            return Ok(new { message = "Transmission type deleted successfully." });
+
+        }
+        #endregion
     }
 }

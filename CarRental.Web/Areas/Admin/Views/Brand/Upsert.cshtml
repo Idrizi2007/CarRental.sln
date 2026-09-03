@@ -1,0 +1,42 @@
+@model Brand
+
+@{
+    // Id 0 means nothing loaded it from the database, so this is a create.
+    var isNew = Model.Id == 0;
+    ViewData["Title"] = isNew ? "Create Brand" : "Edit Brand";
+}
+
+<h1 class="h3 mb-3">@ViewData["Title"]</h1>
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    @* Carries the id back on edit. On create it posts 0, which is how the
+       POST action knows to Add instead of Update. *@
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LogoUrl" class="form-label">Logo URL</label>
+        <input asp-for="LogoUrl" class="form-control" placeholder="https://..." />
+        <div class="form-text">Optional. Paste a link to the brand's logo image.</div>
+        <span asp-validation-for="LogoUrl" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3 form-check">
+        <input asp-for="IsActive" class="form-check-input" />
+        <label asp-for="IsActive" class="form-check-label"></label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">@(isNew ? "Create" : "Update")</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

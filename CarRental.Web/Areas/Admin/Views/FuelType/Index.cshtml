@@ -22,6 +22,10 @@
                 <td>@(fuelType.IsActive ? "Yes" : "No")</td>
                 <td>
                     <a asp-controller="FuelType" asp-action="Edit" asp-route-id="@fuelType.Id" class="btn btn-sm btn-secondary">Edit</a>
+                    <button type="button" class="btn btn-sm btn-danger"
+                            onclick="confirmDelete('@Url.Action("Delete", "FuelType", new { area = "Admin", id = fuelType.Id })', '@fuelType.Name')">
+                        Delete
+                    </button>
                 </td>
             </tr>
         }

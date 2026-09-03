@@ -64,20 +64,20 @@ namespace CarRental.Web.Controllers
 
         #region Api Call
         [HttpDelete]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int? id)
         {
             if (id == 0 || id == null)
             {
-                return Json(new { success = false, message = "Invalid fuel type id." });
+                return BadRequest(new { message = "Invalid fuel type id." });
             }
             var fuelType = _unitOfWork.FuelType.Get(u => u.Id == id);
             if (fuelType == null)
             {
-                return Json(new { success = false, message = "Fuel type not found." });
+                return NotFound(new { message = "Fuel type not found." });
             }
             _unitOfWork.FuelType.Remove(fuelType);
             _unitOfWork.Save();
-            return Json(new { success = true, message = "Fuel type deleted successfully." });
+            return Ok(new { message = "Fuel type deleted successfully." });
         }
 
         #endregion

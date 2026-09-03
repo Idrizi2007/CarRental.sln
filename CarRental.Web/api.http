@@ -5,3 +5,6 @@ DELETE {{host}}/Admin/Category/Delete/99
 
 ### Delete a fuel type
 DELETE {{host}}/Admin/FuelType/Delete/1
+
+### Delete a brand
+DELETE {{host}}/Admin/Brand/Delete/35

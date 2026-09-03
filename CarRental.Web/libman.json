@@ -7,9 +7,16 @@
       "destination": "wwwroot/lib/tinymce/"
     },
     {
-      "provider": "cdnjs",
       "library": "sweetalert2@11.26.25",
       "destination": "wwwroot/lib/sweetalert2/"
+    },
+    {
+      "library": "datatables.net@3.0.2",
+      "destination": "wwwroot/lib/datatables.net/"
+    },
+    {
+      "library": "datatables.net-bs5@3.0.2",
+      "destination": "wwwroot/lib/datatables.net-bs5/"
     }
   ]
 }

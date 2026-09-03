@@ -2,7 +2,7 @@
 
 namespace CarRental.Models
 {
-    public class Category
+    public class Category : ILookup
     {
         [Key]
         public int Id { get; set; }

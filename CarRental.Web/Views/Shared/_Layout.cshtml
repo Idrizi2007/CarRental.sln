@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/CarRental.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/datatables.net-bs5/dataTables.bootstrap5.min.css" />
     <style>
         /* sidebar + content sit side by side, full height */
         .page-body {
@@ -139,6 +140,9 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="~/lib/tinymce/tinymce.min.js"></script>
     <script src="~/lib/sweetalert2/sweetalert2.all.min.js"></script>
+    <script src="~/js/admin-delete.js" asp-append-version="true"></script>
+    <script src="~/lib/datatables.net/dataTables.min.js"></script>
+    <script src="~/lib/datatables.net-bs5/dataTables.bootstrap5.min.js"></script>
     <partial name="_Notification"/>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
