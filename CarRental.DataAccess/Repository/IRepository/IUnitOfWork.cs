@@ -16,6 +16,7 @@
 
         IVehicleRepository Vehicle { get; }
 
+        IVehicleImageRepository VehicleImage { get; }
         void Save();
     }
 }

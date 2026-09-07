@@ -21,6 +21,7 @@ namespace CarRental.DataAccess
         public DbSet<Feature> Features { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
 
+        public DbSet<VehicleImage> VehicleImages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<FuelType>().HasData(
@@ -135,6 +136,11 @@ namespace CarRental.DataAccess
             modelBuilder.Entity<Vehicle>().Property(u => u.RentalPricePerDay).HasPrecision(10, 2);
 
             modelBuilder.Entity<Vehicle>().Property(u => u.SalePrice).HasPrecision(10, 2);
+
+            modelBuilder.Entity<VehicleImage>().HasOne(u => u.Vehicle)
+                                               .WithMany(u => u.VehicleImages)
+                                               .HasForeignKey(u => u.VehicleId)
+                                               .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

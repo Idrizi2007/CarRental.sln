@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarRental.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260901164108_AddedVehicle")]
-    partial class AddedVehicle
+    [Migration("20260905094431_AddedMigration")]
+    partial class AddedMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -611,11 +611,11 @@ namespace CarRental.DataAccess.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<decimal?>("RentalPricePerDay")
+                    b.Property<decimal>("RentalPricePerDay")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<decimal?>("SalePrice")
+                    b.Property<decimal>("SalePrice")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
@@ -645,6 +645,36 @@ namespace CarRental.DataAccess.Migrations
                     b.HasIndex("VehicleModelId");
 
                     b.ToTable("Vehicles");
+                });
+
+            modelBuilder.Entity("CarRental.Models.VehicleImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AltText")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("VehicleImages");
                 });
 
             modelBuilder.Entity("CarRental.Models.VehicleModel", b =>
@@ -708,6 +738,17 @@ namespace CarRental.DataAccess.Migrations
                     b.Navigation("VehicleModel");
                 });
 
+            modelBuilder.Entity("CarRental.Models.VehicleImage", b =>
+                {
+                    b.HasOne("CarRental.Models.Vehicle", "Vehicle")
+                        .WithMany("VehicleImages")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("CarRental.Models.VehicleModel", b =>
                 {
                     b.HasOne("CarRental.Models.Brand", "Brand")
@@ -717,6 +758,11 @@ namespace CarRental.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Brand");
+                });
+
+            modelBuilder.Entity("CarRental.Models.Vehicle", b =>
+                {
+                    b.Navigation("VehicleImages");
                 });
 #pragma warning restore 612, 618
         }

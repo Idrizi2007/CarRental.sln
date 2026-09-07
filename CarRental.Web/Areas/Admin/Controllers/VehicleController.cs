@@ -9,9 +9,12 @@ namespace CarRental.Web.Areas.Admin.Controllers
     public class VehicleController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        public VehicleController(IUnitOfWork unitOfWork)
+        private readonly IWebHostEnvironment _hostEnvironment;
+        public VehicleController(IUnitOfWork unitOfWork, IWebHostEnvironment hostEnvironment)
         {
             _unitOfWork = unitOfWork;
+            _hostEnvironment=hostEnvironment;
+
         }
         public IActionResult Index()
         {
@@ -40,8 +43,9 @@ namespace CarRental.Web.Areas.Admin.Controllers
             return View(vehicleFromDb);
         }
         [HttpPost]
-        public IActionResult Upsert(VehicleVM vehicleVM)
+        public IActionResult Upsert(VehicleVM vehicleVM, List<IFormFile>? files)
         {
+
             if (ModelState.IsValid)
             {
                 bool isNew = vehicleVM.Vehicle.Id == 0;
@@ -54,7 +58,26 @@ namespace CarRental.Web.Areas.Admin.Controllers
                 {
                     _unitOfWork.Vehicle.Update(vehicleVM.Vehicle);
                 }
+
                 _unitOfWork.Save();
+                if (files != null && files.Count > 0)
+                {
+                    string rootPath = _hostEnvironment.WebRootPath;
+                    string path = Path.Combine(rootPath, "images", "vehicles", vehicleVM.Vehicle.Id.ToString());
+                    Directory.CreateDirectory(path);
+                    var imageFromDb = _unitOfWork.VehicleImage.GetAll(u => u.VehicleId == vehicleVM.Vehicle.Id);
+                    foreach (var file in files)
+                    {
+                        if (file.Length > 10 * 1024 * 1024|| file.Length == 0) continue; // Skip files larger than 10MB or empty files
+                        var fileName = Guid.NewGuid().ToString() + (Path.GetExtension(file.FileName));
+                        var filePath = Path.Combine(path, fileName);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            file.CopyTo(stream);
+                        }
+                    }
+
+                }
                 TempData["success"] = isNew ? "Vehicle created successfully" : "Vehicle updated successfully";
                 return RedirectToAction(nameof(Index));
             }

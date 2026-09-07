@@ -644,6 +644,36 @@ namespace CarRental.DataAccess.Migrations
                     b.ToTable("Vehicles");
                 });
 
+            modelBuilder.Entity("CarRental.Models.VehicleImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AltText")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VehicleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("VehicleImages");
+                });
+
             modelBuilder.Entity("CarRental.Models.VehicleModel", b =>
                 {
                     b.Property<int>("Id")
@@ -705,6 +735,17 @@ namespace CarRental.DataAccess.Migrations
                     b.Navigation("VehicleModel");
                 });
 
+            modelBuilder.Entity("CarRental.Models.VehicleImage", b =>
+                {
+                    b.HasOne("CarRental.Models.Vehicle", "Vehicle")
+                        .WithMany("VehicleImages")
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehicle");
+                });
+
             modelBuilder.Entity("CarRental.Models.VehicleModel", b =>
                 {
                     b.HasOne("CarRental.Models.Brand", "Brand")
@@ -714,6 +755,11 @@ namespace CarRental.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Brand");
+                });
+
+            modelBuilder.Entity("CarRental.Models.Vehicle", b =>
+                {
+                    b.Navigation("VehicleImages");
                 });
 #pragma warning restore 612, 618
         }

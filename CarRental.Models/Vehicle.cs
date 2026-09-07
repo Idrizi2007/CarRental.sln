@@ -98,5 +98,7 @@ namespace CarRental.Models
         // Set once on create, never changed on edit.
         [Display(Name = "Added")]
         public DateTime CreatedAt { get; set; }
+
+        public ICollection<VehicleImage>? VehicleImages { get; set; }
     }
 }

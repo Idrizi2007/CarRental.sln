@@ -19,6 +19,7 @@ namespace CarRental.DataAccess.Repository
 
         public IVehicleRepository Vehicle { get; private set; }
 
+        public IVehicleImageRepository VehicleImage { get; private set; }
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
@@ -29,6 +30,7 @@ namespace CarRental.DataAccess.Repository
             VehicleModel = new VehicleModelRepository(_db);
             Feature = new FeatureRepository(_db);
             Vehicle = new VehicleRepository(_db);
+            VehicleImage = new VehicleImageRepository(_db);
         }
 
 
