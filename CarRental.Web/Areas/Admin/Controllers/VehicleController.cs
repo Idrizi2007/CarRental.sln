@@ -4,6 +4,7 @@ using CarRental.Web.Extensions;
 using CarRental.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 namespace CarRental.Web.Areas.Admin.Controllers
+
 {
     [Area("Admin")]
     public class VehicleController : Controller
@@ -35,7 +36,7 @@ namespace CarRental.Web.Areas.Admin.Controllers
             {
                 return View(vehicleFromDb);
             }
-            vehicleFromDb.Vehicle = _unitOfWork.Vehicle.Get(u => u.Id == id, includeProperties: "VehicleModel.Brand,Category,FuelType,TransmissionType");
+            vehicleFromDb.Vehicle = _unitOfWork.Vehicle.Get(u => u.Id == id, includeProperties: "VehicleModel.Brand,Category,FuelType,TransmissionType,VehicleImages");
             if (vehicleFromDb.Vehicle == null)
             {
                 return NotFound();
@@ -65,17 +66,34 @@ namespace CarRental.Web.Areas.Admin.Controllers
                     string rootPath = _hostEnvironment.WebRootPath;
                     string path = Path.Combine(rootPath, "images", "vehicles", vehicleVM.Vehicle.Id.ToString());
                     Directory.CreateDirectory(path);
-                    var imageFromDb = _unitOfWork.VehicleImage.GetAll(u => u.VehicleId == vehicleVM.Vehicle.Id);
+                    int sortOrder = _unitOfWork.VehicleImage.GetAll(u => u.VehicleId == vehicleVM.Vehicle.Id).Count();
+                    string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
                     foreach (var file in files)
                     {
-                        if (file.Length > 10 * 1024 * 1024|| file.Length == 0) continue; // Skip files larger than 10MB or empty files
-                        var fileName = Guid.NewGuid().ToString() + (Path.GetExtension(file.FileName));
+                        var extension = Path.GetExtension(file.FileName).ToLower();
+                        if (!allowedExtensions.Contains(extension))
+                            continue;// Skip files with disallowed extensions
+                        if (file.Length > 10 * 1024 * 1024|| file.Length == 0)
+                            continue; // Skip files larger than 10MB or empty files
+                        var fileName = Guid.NewGuid().ToString() + extension;
                         var filePath = Path.Combine(path, fileName);
                         using (var stream = new FileStream(filePath, FileMode.Create))
                         {
                             file.CopyTo(stream);
                         }
+                        string ImageUrl = $"/images/vehicles/{vehicleVM.Vehicle.Id}/{fileName}";
+                        var vehicleImage = new VehicleImage()
+                        {
+                            VehicleId = vehicleVM.Vehicle.Id,
+                            ImageUrl = ImageUrl,
+                            SortOrder = sortOrder++,
+
+                        };
+                        _unitOfWork.VehicleImage.Add(vehicleImage);
                     }
+                    _unitOfWork.Save();
+
+
 
                 }
                 TempData["success"] = isNew ? "Vehicle created successfully" : "Vehicle updated successfully";
@@ -93,7 +111,7 @@ namespace CarRental.Web.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var vehiclesFromDb = _unitOfWork.Vehicle.GetAll(includeProperties: "VehicleModel.Brand,Category,FuelType,TransmissionType").ToList();
+            var vehiclesFromDb = _unitOfWork.Vehicle.GetAll(includeProperties: "VehicleModel.Brand,Category,FuelType,TransmissionType,VehicleImages").ToList();
             return Json(new { data = vehiclesFromDb });
         }
         [HttpDelete]
@@ -108,9 +126,40 @@ namespace CarRental.Web.Areas.Admin.Controllers
             {
                 return NotFound(new { message = "Vehicle not found" });
             }
+            // Cascade removes the VehicleImages rows, but SQL cannot see the disk.
+            // The files have to go here or they stay forever with nothing pointing at them.
+            var vehiclePath = Path.Combine(_hostEnvironment.WebRootPath, "images", "vehicles", vehcicleFromDb.Id.ToString());
+            if (Directory.Exists(vehiclePath))
+            {
+                Directory.Delete(vehiclePath, true);
+            }
+
             _unitOfWork.Vehicle.Remove(vehcicleFromDb);
             _unitOfWork.Save();
             return Ok(new { message = "Vehicle deleted successfully" });
+        }
+
+        [HttpDelete]
+
+        public IActionResult DeleteImage(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return BadRequest(new { message = "Invalid Image ID" });
+            }
+            var imageFromDb = _unitOfWork.VehicleImage.Get(u => u.Id == id);
+            if (imageFromDb == null)
+            {
+                return NotFound(new { message = "Image not Found" });
+            }
+            var imagePath = Path.Combine(_hostEnvironment.WebRootPath, imageFromDb.ImageUrl.TrimStart('/'));
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
+            _unitOfWork.VehicleImage.Remove(imageFromDb);
+            _unitOfWork.Save();
+            return Ok(new { message = "Image deleted successfully" });
         }
         #endregion
     }

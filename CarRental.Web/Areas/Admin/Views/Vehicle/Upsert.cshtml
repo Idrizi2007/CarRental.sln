@@ -7,7 +7,9 @@
 
 <h1 class="h3 mb-3">@ViewData["Title"]</h1>
 
-<form method="post">
+@* enctype is what makes the browser send the file bytes. Without it only
+   the filename arrives and the IFormFile list comes through empty. *@
+<form method="post" enctype="multipart/form-data">
     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
     @* Carries the id back on edit; posts 0 on create, which is how the POST
@@ -161,6 +163,53 @@
                 <div class="form-text">Untick to hide this car from the public site without deleting it.</div>
             </div>
         </div>
+
+        @* ---------------- photos ---------------- *@
+        <div class="col-12 mt-4">
+            <h2 class="h6 text-uppercase text-muted border-bottom pb-2">Photos</h2>
+        </div>
+
+        @* name="files" must match the List<IFormFile> parameter on the POST —
+           that is how model binding pairs them up. *@
+        <div class="col-12">
+            <label for="files" class="form-label">Add photos</label>
+            <input type="file" name="files" id="files" class="form-control"
+                   multiple accept=".jpg,.jpeg,.png,.webp" />
+            <div class="form-text">
+                JPG, PNG or WEBP, up to 10 MB each. The first photo in the list is
+                the one shown on the public catalogue.
+            </div>
+        </div>
+
+        @* Existing photos. Null on create, and null on edit unless the GET
+           includes VehicleImages. Ordered so position 0 reads as the cover. *@
+        @if (Model.Vehicle.VehicleImages != null && Model.Vehicle.VehicleImages.Any())
+        {
+            <div class="col-12">
+                <div class="row g-3">
+                    @foreach (var image in Model.Vehicle.VehicleImages.OrderBy(u => u.SortOrder))
+                    {
+                        <div class="col-6 col-md-3 col-lg-2">
+                            <div class="card h-100">
+                                <img src="@image.ImageUrl" class="card-img-top"
+                                     alt="@image.AltText"
+                                     style="height: 120px; object-fit: cover;" />
+                                <div class="card-body p-2 text-center">
+                                    @if (image.SortOrder == Model.Vehicle.VehicleImages.Min(u => u.SortOrder))
+                                    {
+                                        <span class="badge bg-primary mb-2">Cover</span>
+                                    }
+                                    <button type="button" class="btn btn-sm btn-outline-danger w-100"
+                                            onclick="confirmDelete('/Admin/Vehicle/DeleteImage/@image.Id', 'this photo')">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
 
         <div class="col-12 mt-4">
             <button type="submit" class="btn btn-primary">@(isNew ? "Create" : "Update")</button>
