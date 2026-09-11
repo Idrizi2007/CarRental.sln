@@ -1,9 +1,11 @@
 ﻿using CarRental.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarRental.DataAccess
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     {
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
@@ -22,8 +24,9 @@ namespace CarRental.DataAccess
         public DbSet<Vehicle> Vehicles { get; set; }
 
         public DbSet<VehicleImage> VehicleImages { get; set; }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<FuelType>().HasData(
               new FuelType { Id = 1, Name = "Petrol" },
               new FuelType { Id = 2, Name = "Diesel" },
