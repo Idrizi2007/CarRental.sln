@@ -1,7 +1,7 @@
 ﻿namespace CarRental.Utility
 {
-    public class SD
+    public static class SD
     {
-        public static string AdminRole = "Admin";
+        public const string AdminRole = "Admin";
     }
 }
