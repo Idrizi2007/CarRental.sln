@@ -28,6 +28,35 @@ namespace CarRental.DataAccess.DbInitializer
             {
                 _roleManager.CreateAsync(new IdentityRole(SD.AdminRole)).GetAwaiter().GetResult();
             }
+            string email = _configuration["AdminUser:Email"];
+            string password = _configuration["AdminUser:Password"];
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                throw new Exception("Admin user email or password is not configured.");
+            }
+
+            var user = _userManager.FindByEmailAsync(email).GetAwaiter().GetResult();
+            if (user == null)
+            {
+                user = new IdentityUser()
+                {
+                    UserName = email,
+                    Email = email,
+                    EmailConfirmed = true
+                };
+                var result = _userManager.CreateAsync(user, password).GetAwaiter().GetResult();
+
+                if (!result.Succeeded)
+                {
+                    throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+                }
+
+            }
+
+            if (!_userManager.IsInRoleAsync(user, SD.AdminRole).GetAwaiter().GetResult())
+            {
+                _userManager.AddToRoleAsync(user, SD.AdminRole).GetAwaiter().GetResult();
+            }
         }
     }
 }

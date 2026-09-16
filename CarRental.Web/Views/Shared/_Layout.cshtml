@@ -60,6 +60,35 @@
                 border-left-color: #3b82f6;
             }
 
+        /* signed-in email in the Account section; long addresses get cut with "…" */
+        .sidebar-user {
+            display: block;
+            padding: 0.35rem 1.25rem;
+            color: #9ca3af;
+            font-size: 0.85rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Log out is a <button> inside a POST form; make it look like the sidebar links */
+        .sidebar-button {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 1.25rem;
+            background: none;
+            border: 0;
+            border-left: 3px solid transparent;
+            color: #d1d5db;
+            text-align: left;
+            font: inherit;
+        }
+
+            .sidebar-button:hover {
+                background-color: #374151;
+                color: #fff;
+            }
+
         /* everything to the right of the sidebar */
         .page-main {
             flex-grow: 1;
@@ -122,6 +151,8 @@
                 <div class="sidebar-heading">Settings</div>
                 <a asp-area="Admin" asp-controller="SiteSetting" asp-action="Index"
                    class="@(currentController == "SiteSetting" ? "active" : "")">Site Settings</a>
+
+                <partial name="_LoginPartial" />
             </nav>
 
         <div class="page-main">

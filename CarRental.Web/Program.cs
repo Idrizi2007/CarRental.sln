@@ -1,4 +1,5 @@
 using CarRental.DataAccess;
+using CarRental.DataAccess.DbInitializer;
 using CarRental.DataAccess.Repository;
 using CarRental.DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Identity;
@@ -14,7 +15,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
-
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 var app = builder.Build();
@@ -42,5 +43,13 @@ app.MapControllerRoute(
 );
 
 app.MapRazorPages();
+void SeedDatabase()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        scope.ServiceProvider.GetRequiredService<IDbInitializer>().Initialize();
+    }
+}
+SeedDatabase();
 
 app.Run();
