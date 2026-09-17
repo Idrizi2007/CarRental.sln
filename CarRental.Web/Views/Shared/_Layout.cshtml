@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using CarRental.Utility
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -130,27 +131,34 @@
                    class="@(currentController == "Home" ? "active" : "")">Home</a>
                 <a asp-area="Customer" asp-controller="Home" asp-action="Privacy">Privacy</a>
 
-                <div class="sidebar-heading">Manage</div>
-                <a asp-area="Admin" asp-controller="Vehicle" asp-action="Index"
-                   class="@(currentController == "Vehicle" ? "active" : "")">Vehicles</a>
+                @* Admin links only render for users in the Admin role.
+                   This is cosmetic: it hides the menu, it doesn't protect anything.
+                   The real protection is [Authorize(Roles = SD.AdminRole)] on each Admin controller,
+                   which still blocks anyone who types an /Admin/... URL directly. *@
+                @if (User.IsInRole(SD.AdminRole))
+                {
+                    <div class="sidebar-heading">Manage</div>
+                    <a asp-area="Admin" asp-controller="Vehicle" asp-action="Index"
+                       class="@(currentController == "Vehicle" ? "active" : "")">Vehicles</a>
 
-                <div class="sidebar-heading">Lookups</div>
-                <a asp-area="Admin" asp-controller="FuelType" asp-action="Index"
-                   class="@(currentController == "FuelType" ? "active" : "")">Fuel Types</a>
-                <a asp-area="Admin" asp-controller="TransmissionType" asp-action="Index"
-                   class="@(currentController == "TransmissionType" ? "active" : "")">Transmissions</a>
-                <a asp-area="Admin" asp-controller="Category" asp-action="Index"
-                   class="@(currentController == "Category" ? "active" : "")">Categories</a>
-                <a asp-area="Admin" asp-controller="Brand" asp-action="Index"
-                   class="@(currentController == "Brand" ? "active" : "")">Brands</a>
-                <a asp-area="Admin" asp-controller="VehicleModel" asp-action="Index"
-                   class="@(currentController == "VehicleModel" ? "active" : "")">Models</a>
-                <a asp-area="Admin" asp-controller="Feature" asp-action="Index"
-                   class="@(currentController == "Feature" ? "active" : "")">Features</a>
+                    <div class="sidebar-heading">Lookups</div>
+                    <a asp-area="Admin" asp-controller="FuelType" asp-action="Index"
+                       class="@(currentController == "FuelType" ? "active" : "")">Fuel Types</a>
+                    <a asp-area="Admin" asp-controller="TransmissionType" asp-action="Index"
+                       class="@(currentController == "TransmissionType" ? "active" : "")">Transmissions</a>
+                    <a asp-area="Admin" asp-controller="Category" asp-action="Index"
+                       class="@(currentController == "Category" ? "active" : "")">Categories</a>
+                    <a asp-area="Admin" asp-controller="Brand" asp-action="Index"
+                       class="@(currentController == "Brand" ? "active" : "")">Brands</a>
+                    <a asp-area="Admin" asp-controller="VehicleModel" asp-action="Index"
+                       class="@(currentController == "VehicleModel" ? "active" : "")">Models</a>
+                    <a asp-area="Admin" asp-controller="Feature" asp-action="Index"
+                       class="@(currentController == "Feature" ? "active" : "")">Features</a>
 
-                <div class="sidebar-heading">Settings</div>
-                <a asp-area="Admin" asp-controller="SiteSetting" asp-action="Index"
-                   class="@(currentController == "SiteSetting" ? "active" : "")">Site Settings</a>
+                    <div class="sidebar-heading">Settings</div>
+                    <a asp-area="Admin" asp-controller="SiteSetting" asp-action="Index"
+                       class="@(currentController == "SiteSetting" ? "active" : "")">Site Settings</a>
+                }
 
                 <partial name="_LoginPartial" />
             </nav>

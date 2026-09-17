@@ -1,12 +1,16 @@
 ﻿using CarRental.DataAccess.Repository.IRepository;
 using CarRental.Models;
+using CarRental.Utility;
 using CarRental.Web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CarRental.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.AdminRole)]
+
     public class VehicleModelController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
