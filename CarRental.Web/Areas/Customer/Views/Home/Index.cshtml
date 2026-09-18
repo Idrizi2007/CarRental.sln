@@ -1,8 +1,17 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model IEnumerable<Vehicle>
+@{
+    ViewData["Title"] = "Our vehicles";
+    var count = Model.Count();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-4">
+    <h1 class="h3 mb-0">Our vehicles</h1>
+    @if (count > 0)
+    {
+        <span class="text-muted">@count @(count == 1 ? "vehicle" : "vehicles") available</span>
+    }
 </div>
+
+@* The grid lives in a partial so the filtering step can re-render just the cards
+   (returning PartialView("_VehicleGrid", filteredList)) without redrawing the page. *@
+<partial name="_VehicleGrid" model="Model" />

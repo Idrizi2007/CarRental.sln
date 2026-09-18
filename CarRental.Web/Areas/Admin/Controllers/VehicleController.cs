@@ -49,7 +49,10 @@ namespace CarRental.Web.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult Upsert(VehicleVM vehicleVM, List<IFormFile>? files)
         {
-
+            if (!vehicleVM.Vehicle.IsForRent && !vehicleVM.Vehicle.IsForSale)
+            {
+                ModelState.AddModelError("", "Please select at least one option for rent or sale.");
+            }
             if (ModelState.IsValid)
             {
                 bool isNew = vehicleVM.Vehicle.Id == 0;
@@ -70,7 +73,7 @@ namespace CarRental.Web.Areas.Admin.Controllers
                     string path = Path.Combine(rootPath, "images", "vehicles", vehicleVM.Vehicle.Id.ToString());
                     Directory.CreateDirectory(path);
                     int sortOrder = _unitOfWork.VehicleImage.GetAll(u => u.VehicleId == vehicleVM.Vehicle.Id).Count();
-                    string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp" };
+                    string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".webp", ".avif" };
                     foreach (var file in files)
                     {
                         var extension = Path.GetExtension(file.FileName).ToLower();

@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Uploaded vehicle photos are data, not code
+CarRental.Web/wwwroot/images/vehicles/

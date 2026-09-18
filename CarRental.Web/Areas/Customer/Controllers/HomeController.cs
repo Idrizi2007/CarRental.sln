@@ -1,3 +1,4 @@
+using CarRental.DataAccess.Repository.IRepository;
 using CarRental.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -7,22 +8,19 @@ namespace CarRental.Web.Areas.Customer.Controllers
     [Area("Customer")]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IUnitOfWork unitOfWork)
         {
-            _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var vehicles = _unitOfWork.Vehicle.GetAll(u => u.IsActive, includeProperties: "VehicleModel.Brand,Category,FuelType,TransmissionType,VehicleImages").OrderByDescending(u => u.CreatedAt).ToList();
+            return View(vehicles);
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

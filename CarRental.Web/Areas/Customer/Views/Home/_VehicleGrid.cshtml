@@ -1,0 +1,110 @@
+@using System.Globalization
+@model IEnumerable<Vehicle>
+
+@functions {
+    // Invariant culture so prices look the same on your laptop and on the server,
+    // whatever language Windows is set to there. "#,0.##" drops ".00": €45, €1,250.50.
+    static string Euro(decimal value) => "€" + value.ToString("#,0.##", CultureInfo.InvariantCulture);
+}
+
+@if (!Model.Any())
+{
+    <div class="text-center text-muted py-5">
+        <p class="h5 mb-1">No vehicles to show right now.</p>
+        <p class="mb-0">Please check back soon.</p>
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4 g-4">
+        @foreach (var v in Model)
+        {
+            var brand = v.VehicleModel?.Brand?.Name;
+            var model = v.VehicleModel?.Name;
+            var title = $"{brand} {model}".Trim();
+            if (string.IsNullOrEmpty(title)) { title = "Vehicle"; }
+
+            // Same rule as the admin grid: lowest SortOrder is the cover, and the rest follow in order.
+            var images = (v.VehicleImages ?? new List<VehicleImage>()).OrderBy(i => i.SortOrder).ToList();
+            var carouselId = $"vehicle-{v.Id}-photos";
+
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+
+                    @if (images.Count == 0)
+                    {
+                        <div class="ratio ratio-4x3 bg-light">
+                            <div class="d-flex align-items-center justify-content-center text-muted">No photo yet</div>
+                        </div>
+                    }
+                    else
+                    {
+                        @* Arrows only, no auto-rotate: a grid full of cards all cycling at once is distracting.
+                           data-bs-interval="false" stops it cycling on its own even after someone clicks an arrow.
+                           Only the first photo loads with the page; the rest wait until they're shown. *@
+                        <div id="@carouselId" class="carousel slide card-img-top" data-bs-interval="false">
+                            <div class="carousel-inner">
+                                @for (var i = 0; i < images.Count; i++)
+                                {
+                                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                                        <div class="ratio ratio-4x3">
+                                            <img src="@images[i].ImageUrl"
+                                                 alt="@(images[i].AltText ?? $"{title} {v.Year}, photo {i + 1}")"
+                                                 class="vehicle-photo"
+                                                 loading="@(i == 0 ? "eager" : "lazy")" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            @if (images.Count > 1)
+                            {
+                                <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous photo</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next photo</span>
+                                </button>
+                                <span class="badge bg-dark bg-opacity-75 position-absolute top-0 end-0 m-2">@images.Count photos</span>
+                            }
+                        </div>
+                    }
+
+                    <div class="card-body d-flex flex-column">
+                        @* The title is the link, not the whole card: a card-wide link would swallow
+                           the carousel arrows, so clicking "next photo" would open the car instead. *@
+                        <h2 class="h6 mb-1">
+                            <a asp-area="Customer" asp-controller="Home" asp-action="Details" asp-route-id="@v.Id"
+                               class="text-reset text-decoration-none">@title</a>
+                        </h2>
+
+                        <p class="text-muted small mb-3">
+                            @v.Year
+                            @if (v.Category != null) { <text>&middot; @v.Category.Name</text> }
+                            @if (v.FuelType != null) { <text>&middot; @v.FuelType.Name</text> }
+                            @if (v.TransmissionType != null) { <text>&middot; @v.TransmissionType.Name</text> }
+                        </p>
+
+                        <div class="mt-auto">
+                            @if (v.IsForRent)
+                            {
+                                <div><span class="fw-semibold">@Euro(v.RentalPricePerDay)</span> <span class="text-muted small">/ day</span></div>
+                            }
+                            @if (v.IsForSale)
+                            {
+                                <div><span class="fw-semibold">@Euro(v.SalePrice)</span> <span class="text-muted small">to buy</span></div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-top-0 pt-0 pb-3">
+                        <a asp-area="Customer" asp-controller="Home" asp-action="Details" asp-route-id="@v.Id"
+                           class="btn btn-outline-primary btn-sm w-100">View details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

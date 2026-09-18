@@ -129,7 +129,6 @@
                 <div class="sidebar-heading">Site</div>
                 <a asp-area="Customer" asp-controller="Home" asp-action="Index"
                    class="@(currentController == "Home" ? "active" : "")">Home</a>
-                <a asp-area="Customer" asp-controller="Home" asp-action="Privacy">Privacy</a>
 
                 @* Admin links only render for users in the Admin role.
                    This is cosmetic: it hides the menu, it doesn't protect anything.
@@ -169,7 +168,7 @@
             </main>
 
             <footer class="border-top footer text-muted px-4 py-3">
-                &copy; 2026 - CarRental.Web - <a asp-area="Customer" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                &copy; 2026 - CarRental.Web
             </footer>
         </div>
     </div>
