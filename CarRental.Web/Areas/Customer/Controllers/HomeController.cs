@@ -21,6 +21,20 @@ namespace CarRental.Web.Areas.Customer.Controllers
             return View(vehicles);
         }
 
+        public IActionResult Details(int? id)
+        {
+            if (id == 0 || id == null)
+            {
+                return NotFound();
+            }
+            var vehicleFromDb = _unitOfWork.Vehicle.Get(u => u.Id == id && u.IsActive, includeProperties: "VehicleModel.Brand,Category,FuelType,TransmissionType,VehicleImages");
+            if (vehicleFromDb == null)
+            {
+                return NotFound();
+            }
+            return View(vehicleFromDb);
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

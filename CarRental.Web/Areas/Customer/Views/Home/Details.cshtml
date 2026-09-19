@@ -1,0 +1,222 @@
+@using System.Globalization
+@model Vehicle
+
+@functions {
+    // Same formatting as _VehicleGrid, so a price reads identically on the card and here.
+    // Invariant culture keeps it stable across machines; "#,0.##" drops ".00".
+    static string Euro(decimal value) => "€" + value.ToString("#,0.##", CultureInfo.InvariantCulture);
+}
+
+@{
+    var brand = Model.VehicleModel?.Brand?.Name;
+    var modelName = Model.VehicleModel?.Name;
+    var title = $"{brand} {modelName}".Trim();
+    if (string.IsNullOrEmpty(title)) { title = "Vehicle"; }
+
+    ViewData["Title"] = $"{title} {Model.Year}";
+
+    // Lowest SortOrder first, so the admin's cover photo opens the gallery.
+    var images = (Model.VehicleImages ?? new List<VehicleImage>()).OrderBy(i => i.SortOrder).ToList();
+    const string galleryId = "vehicleGallery";
+
+    // Fuel/transmission/category are nullable navigation properties; show a dash rather than blank.
+    string OrDash(string? value) => string.IsNullOrWhiteSpace(value) ? "—" : value;
+}
+
+<nav class="mb-3">
+    <a asp-area="Customer" asp-controller="Home" asp-action="Index" class="text-decoration-none">&larr; All vehicles</a>
+</nav>
+
+<div class="row g-4">
+
+    @* ---------------- gallery ---------------- *@
+    <div class="col-lg-7">
+        @if (images.Count == 0)
+        {
+            <div class="ratio ratio-4x3 bg-light rounded">
+                <div class="d-flex align-items-center justify-content-center text-muted">No photos yet</div>
+            </div>
+        }
+        else
+        {
+            @* Auto-rotate lives here rather than on the homepage cards: one big gallery the visitor
+               is looking at, not twenty cards cycling at once. It's started from the script below
+               so it can stay still for anyone whose system asks for reduced motion. *@
+            <div id="@galleryId" class="carousel slide rounded overflow-hidden">
+                <div class="carousel-inner">
+                    @for (var i = 0; i < images.Count; i++)
+                    {
+                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                            <div class="ratio ratio-4x3 bg-light">
+                                <img src="@images[i].ImageUrl"
+                                     alt="@(images[i].AltText ?? $"{title} {Model.Year}, photo {i + 1} of {images.Count}")"
+                                     class="vehicle-photo" />
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (images.Count > 1)
+                {
+                    <button class="carousel-control-prev" type="button" data-bs-target="#@galleryId" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous photo</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#@galleryId" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next photo</span>
+                    </button>
+                }
+            </div>
+
+            @if (images.Count > 1)
+            {
+                @* Thumbnail strip: each one jumps the gallery to its photo. *@
+                <div class="d-flex flex-wrap gap-2 mt-2" id="@(galleryId)Thumbs">
+                    @for (var i = 0; i < images.Count; i++)
+                    {
+                        <button type="button"
+                                class="gallery-thumb p-0 border rounded overflow-hidden @(i == 0 ? "active" : "")"
+                                data-bs-target="#@galleryId" data-bs-slide-to="@i"
+                                aria-label="Show photo @(i + 1)" aria-current="@(i == 0 ? "true" : null)">
+                            <img src="@images[i].ImageUrl" alt="" class="vehicle-photo" loading="lazy" />
+                        </button>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    @* ---------------- summary ---------------- *@
+    <div class="col-lg-5">
+        <h1 class="h3 mb-1">@title</h1>
+        <p class="text-muted mb-3">
+            @Model.Year
+            @if (Model.Category != null) { <text>&middot; @Model.Category.Name</text> }
+        </p>
+
+        <div class="mb-4">
+            @if (Model.IsForRent)
+            {
+                <div class="mb-1">
+                    <span class="h4 mb-0">@Euro(Model.RentalPricePerDay)</span>
+                    <span class="text-muted">/ day to rent</span>
+                </div>
+            }
+            @if (Model.IsForSale)
+            {
+                <div>
+                    <span class="h4 mb-0">@Euro(Model.SalePrice)</span>
+                    <span class="text-muted">to buy</span>
+                </div>
+            }
+        </div>
+
+        @* ============ CALL TO ACTION — filled in per client after the template split ============
+           Intentionally empty in the template. Each client's version puts its own action here:
+           a WhatsApp or phone button, an enquiry form, a booking button, or checkout.
+           Everything it might need is already on the page's model: @Model.Id, title, year, prices.
+           ======================================================================================= *@
+
+        <dl class="row small mb-0">
+            <dt class="col-5 text-muted fw-normal">Fuel</dt>
+            <dd class="col-7">@OrDash(Model.FuelType?.Name)</dd>
+
+            <dt class="col-5 text-muted fw-normal">Transmission</dt>
+            <dd class="col-7">@OrDash(Model.TransmissionType?.Name)</dd>
+
+            <dt class="col-5 text-muted fw-normal">Mileage</dt>
+            <dd class="col-7">@Model.Mileage.ToString("#,0", CultureInfo.InvariantCulture) km</dd>
+
+            <dt class="col-5 text-muted fw-normal">Seats</dt>
+            <dd class="col-7">@Model.Seats</dd>
+        </dl>
+    </div>
+</div>
+
+@* ---------------- full specification ---------------- *@
+<section class="mt-5">
+    <h2 class="h5 border-bottom pb-2 mb-3">Specification</h2>
+
+    @* The registration plate is deliberately not shown: it's an internal identifier for the
+       admin, and dealers usually keep it off public listings. *@
+    <dl class="row mb-0">
+        <dt class="col-sm-4 col-lg-2 text-muted fw-normal">Brand</dt>
+        <dd class="col-sm-8 col-lg-4">@OrDash(brand)</dd>
+
+        <dt class="col-sm-4 col-lg-2 text-muted fw-normal">Model</dt>
+        <dd class="col-sm-8 col-lg-4">@OrDash(modelName)</dd>
+
+        <dt class="col-sm-4 col-lg-2 text-muted fw-normal">Year</dt>
+        <dd class="col-sm-8 col-lg-4">@Model.Year</dd>
+
+        <dt class="col-sm-4 col-lg-2 text-muted fw-normal">Category</dt>
+        <dd class="col-sm-8 col-lg-4">@OrDash(Model.Category?.Name)</dd>
+
+        <dt class="col-sm-4 col-lg-2 text-muted fw-normal">Fuel</dt>
+        <dd class="col-sm-8 col-lg-4">@OrDash(Model.FuelType?.Name)</dd>
+
+        <dt class="col-sm-4 col-lg-2 text-muted fw-normal">Transmission</dt>
+        <dd class="col-sm-8 col-lg-4">@OrDash(Model.TransmissionType?.Name)</dd>
+
+        <dt class="col-sm-4 col-lg-2 text-muted fw-normal">Engine</dt>
+        <dd class="col-sm-8 col-lg-4">
+            @(Model.EngineSize.HasValue
+                ? Model.EngineSize.Value.ToString("0.0", CultureInfo.InvariantCulture) + " L"
+                : "—")
+        </dd>
+
+        <dt class="col-sm-4 col-lg-2 text-muted fw-normal">Mileage</dt>
+        <dd class="col-sm-8 col-lg-4">@Model.Mileage.ToString("#,0", CultureInfo.InvariantCulture) km</dd>
+
+        <dt class="col-sm-4 col-lg-2 text-muted fw-normal">Seats</dt>
+        <dd class="col-sm-8 col-lg-4">@Model.Seats</dd>
+
+        <dt class="col-sm-4 col-lg-2 text-muted fw-normal">Doors</dt>
+        <dd class="col-sm-8 col-lg-4">@Model.Doors</dd>
+
+        <dt class="col-sm-4 col-lg-2 text-muted fw-normal">Colour</dt>
+        <dd class="col-sm-8 col-lg-4">@OrDash(Model.Color)</dd>
+    </dl>
+</section>
+
+@* ---------------- description ---------------- *@
+@if (!string.IsNullOrWhiteSpace(Model.Description))
+{
+    <section class="mt-5">
+        <h2 class="h5 border-bottom pb-2 mb-3">Description</h2>
+        @* Html.Raw because TinyMCE stores formatted HTML (bold, lists). Without it the visitor
+           would see literal <p> and <strong> tags. This is only acceptable because the text
+           comes from the logged-in admin. Never Html.Raw anything the public can type. *@
+        <div class="vehicle-description">@Html.Raw(Model.Description)</div>
+    </section>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            var gallery = document.getElementById('@galleryId');
+            if (!gallery) { return; }
+
+            // Auto-rotate every 5 s and pause while hovered, unless the visitor's system asks for
+            // reduced motion, in which case the gallery only moves when they click.
+            var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            new bootstrap.Carousel(gallery, {
+                interval: reduceMotion ? false : 5000,
+                ride: reduceMotion ? false : 'carousel',
+                pause: 'hover'
+            });
+
+            // Keep the highlighted thumbnail in step with the photo on show,
+            // whether it moved on its own, by arrow, or by thumbnail click.
+            var thumbs = document.querySelectorAll('#@(galleryId)Thumbs .gallery-thumb');
+            gallery.addEventListener('slide.bs.carousel', function (e) {
+                thumbs.forEach(function (t, i) {
+                    var isActive = i === e.to;
+                    t.classList.toggle('active', isActive);
+                    if (isActive) { t.setAttribute('aria-current', 'true'); } else { t.removeAttribute('aria-current'); }
+                });
+            });
+        })();
+    </script>
+}

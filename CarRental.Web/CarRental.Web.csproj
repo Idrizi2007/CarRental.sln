@@ -27,11 +27,5 @@
     <ProjectReference Include="..\CarRental.Utility\CarRental.Utility.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Areas\Customer\Data\" />
-    <Folder Include="Areas\Customer\Models\" />
-  </ItemGroup>
-
-  <ProjectExtensions><VisualStudio><UserProperties libman_1json__JsonSchema="..\..\..\..\..\AppData\Roaming\Microsoft\UserSecrets\adbd1679-ff43-45b6-b54c-6b647cc04251\secrets.json" /></VisualStudio></ProjectExtensions>
 
 </Project>
